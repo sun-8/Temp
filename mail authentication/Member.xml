@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="member">
+ 
+ 	<!-- 아이디 중복 인증 -->
+ 	<select id="id_check" resultType="m">
+ 		select * from ywhyMember where mem_id=#{id}
+ 	</select>
+ 	
+ 	<!-- 회원 저장 -->
+ 	<insert id="mem_insert">
+ 		insert into ywhyMember (mem_id,mem_pwd,mem_name,mem_nick,mem_mail,mem_date)
+ 		values(#{mem_id},#{mem_pwd},#{mem_name},#{mem_nick},#{mem_mail},sysdate);
+ 	</insert>
+ 	
+ 	<!-- 메일 인증 키 받기 -->
+ 	<update id="GetKey" parameterType="Map">
+ 		update ywhyMember set mem_key=#{param2} where mem_id=#{param1}
+ 	</update>
+ 	
+ 	<!-- 메일 인증 확인 -->
+ 	<update id="alter_memKey" parameterType="Map">
+ 		update ywhyMember set mem_key='Y' where mem_id=#{param1} and mem_key=#{param2}
+ 	</update>
+ 
+	<!-- 사용자 로그인 인증 -->
+	<select id="login_check" resultType="m">
+		select * from ywhyMember where mem_id=#{login_id}
+	</select>
+ 
+ </mapper>
