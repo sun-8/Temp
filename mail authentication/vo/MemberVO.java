@@ -11,7 +11,7 @@ public class MemberVO {
 	private String mem_name; //이름
 	private String mem_nick; //닉네임
 	private String mem_mail;
-	private String mem_key;
+	private String mem_key; //메일 인증 키
 	private String mem_date; //가입날짜
 	private int mem_class;
 	

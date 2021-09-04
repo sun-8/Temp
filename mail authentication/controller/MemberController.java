@@ -63,10 +63,16 @@ public class MemberController {
 		System.out.println("비밀번호 암호화 전: "+m.getMem_pwd());
 		m.setMem_pwd(PwdChange.getPassWordToXEMD5String(m.getMem_pwd()));//비밀번호 암호화
 		System.out.println("비밀번호 암호화 후: "+m.getMem_pwd());
+		System.out.println("입력된 아이디: "+m.getMem_id());
+		System.out.println("입력된 메일: "+m.getMem_mail());
+		System.out.println("입력된 이름: "+m.getMem_name());
+		System.out.println("입력된 닉네임: "+m.getMem_nick());
+		//sqlException 1111 부적합한 열 유형 -> VO빈클래스의 변수명과 뷰페이지의 네임 파라미터가 같지 않아서 생긴 에러
 		this.memberService.insertMember(m);//회원저장
 		
 		this.userMailSendService.mailSendWithUserKey(m.getMem_mail(),m.getMem_id(),request);
-		System.out.println("암호화된 메일 키: "+m.getMem_key());//java.sql.SQLException: 부적합한 열 유형: 1111
+		System.out.println("암호화된 메일 키: "+m.getMem_key());
+
 		return "redirect:/";
 	}
 	

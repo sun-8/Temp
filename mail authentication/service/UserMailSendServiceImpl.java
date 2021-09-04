@@ -8,7 +8,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMessage.RecipientType;
 import javax.servlet.http.HttpServletRequest;
 
-import org.mybatis.spring.SqlSessionTemplate;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class UserMailSendServiceImpl implements UserMailSendService {
 	private JavaMailSender javaMailSender;
 	
 	@Autowired
-	private SqlSessionTemplate sqlSessionTemplate;
+	private SqlSession sqlSession;
 	private MemberDAO memberDao;
 	
 	//이메일 난수 만드는 메서드
@@ -60,7 +60,8 @@ public class UserMailSendServiceImpl implements UserMailSendService {
 	public void mailSendWithUserKey(String mem_mail, String mem_id, HttpServletRequest request) {
 		String key = getKey(false, 20);
 		System.out.println(key);
-		memberDao = sqlSessionTemplate.getMapper(MemberDAO.class);
+		memberDao = sqlSession.getMapper(MemberDAO.class);
+		//org.apache.ibatis.binding.BindingException: Type interface com.ywhy.dao.MemberDAO is not known to the MapperRegistry.
 		memberDao.GetKey(mem_id, key); 
 		MimeMessage mail = javaMailSender.createMimeMessage();
 		String htmlStr = "<h2>안녕하세요 MS :p 관리자 입니다.</h2><br><br>" 
@@ -82,7 +83,7 @@ public class UserMailSendServiceImpl implements UserMailSendService {
 	@Override
 	public int key_alter_service(String mem_id, String key) {
 		int resultCont=0;
-		this.memberDao=sqlSessionTemplate.getMapper(MemberDAO.class);
+		this.memberDao=sqlSession.getMapper(MemberDAO.class);
 		resultCont=this.memberDao.alter_memKey(mem_id, key);
 		
 		return resultCont;

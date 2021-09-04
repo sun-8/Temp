@@ -21,7 +21,6 @@ public class MemberDAOImpl implements MemberDAO {
 	public void insertMember(MemberVO m) {
 		this.sqlSession.insert("mem_insert", m);
 	}//회원가입
-
 	
 	@Override
 	public int GetKey(String mem_id, String key) {

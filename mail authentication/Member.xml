@@ -14,12 +14,12 @@
  	<!-- 회원 저장 -->
  	<insert id="mem_insert">
  		insert into ywhyMember (mem_id,mem_pwd,mem_name,mem_nick,mem_mail,mem_date)
- 		values(#{mem_id},#{mem_pwd},#{mem_name},#{mem_nick},#{mem_mail},sysdate);
+ 		values(#{mem_id},#{mem_pwd},#{mem_name},#{mem_nick},#{mem_mail},sysdate)
  	</insert>
  	
  	<!-- 메일 인증 키 받기 -->
  	<update id="GetKey" parameterType="Map">
- 		update ywhyMember set mem_key=#{param2} where mem_id=#{param1}
+ 		update ywhyMember set mem_key=#{mem_key} where mem_id=#{mem_id}
  	</update>
  	
  	<!-- 메일 인증 확인 -->
