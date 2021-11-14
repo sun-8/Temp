@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+    
+    <resultMap type="com.spring.board.vo.BoardVo" id="boardVo">
+    	<result property="boardType" 	column="BOARD_TYPE"/>
+    	<result property="boardNum" 	column="BOARD_NUM"/>
+    	<result property="boardTitle" 	column="BOARD_TITLE"/>
+    	<result property="boardComment" column="BOARD_COMMENT"/>
+    </resultMap>
+    
+    <select id="boardList" parameterType="com.spring.board.vo.PageVo" resultMap="boardVo">
+    
+        SELECT 
+		  CODE_NAME
+		  ,CODE_ID
+		  ,BOARD_TYPE
+		  ,BOARD_NUM
+		  ,BOARD_TITLE
+		  ,BOARD_COMMENT
+		  ,TOTAL_CNT
+		FROM 
+		(
+		  SELECT
+		      	CODE_NAME
+		      	,CODE_ID
+		      	,BOARD_TYPE
+				,BOARD_NUM
+				,BOARD_TITLE
+				,BOARD_COMMENT
+		      	,ROW_NUMBER() OVER(ORDER BY BOARD_NUM DESC) AS NUMROW
+		      	,COUNT(*) OVER() AS TOTAL_CNT
+			FROM
+				BOARD,COM_CODE
+			WHERE
+				BOARD_TYPE = CODE_ID
+			<if test="type != null">
+				AND	BOARD_TYPE IN
+				<foreach collection="type" item="arr" open="(" close=")" separator=",">
+		      		#{arr}
+		      	</foreach>
+		    </if>
+		)
+		WHERE NUMROW BETWEEN (#{pageNo}-1)*10 + 1 AND (#{pageNo})*10
+    </select>
+
+    <select id="boardTotalSelect" parameterType="HashMap" resultType="Integer">
+		  SELECT
+		      	COUNT(*) AS TOTAL_CNT
+			FROM
+				BOARD LEFT OUTER JOIN COM_CODE<!-- INNNER,RIGHT OUTER,LEFT 써도 된다 -->
+			ON
+				BOARD_TYPE = CODE_ID	
+			WHERE
+				BOARD_TYPE IN
+		      	<if test="type == null">
+				(
+					SELECT
+    					CODE_ID
+    				FROM
+    					COM_CODE
+    				WHERE
+    					CODE_TYPE = 'menu'
+    			)
+				</if>
+				<if test="type != null">
+		      		<foreach collection="type" item="arr" open="(" close=")" separator=",">
+		      			#{arr}
+					</foreach>
+				</if>
+
+    </select>
+    	
+    <select id="boardView" parameterType="com.spring.board.vo.BoardVo" resultMap="boardVo">
+    	SELECT
+    		CODE_NAME
+    		,BOARD_TYPE
+    		,BOARD_NUM
+    		,BOARD_TITLE
+    		,BOARD_COMMENT
+		FROM
+    		BOARD LEFT OUTER JOIN COM_CODE
+		ON
+    		BOARD_TYPE = CODE_ID
+    	WHERE 	BOARD_TYPE = #{boardType}  
+    	AND 	BOARD_NUM  = #{boardNum}
+    </select>	
+    
+    <insert id="boardInsert" parameterType="HashMap">
+        INSERT INTO 
+        BOARD
+        (BOARD_TYPE
+        ,BOARD_NUM
+        ,BOARD_TITLE
+        ,BOARD_COMMENT
+        ,CREATOR
+        ,CREATE_TIME
+        ,MODIFIER
+        ,MODIFIED_TIME
+        )
+        VALUES
+        <foreach collection="boardVo" item="arr" separator=",">
+        	(#{boardType}
+        	,(
+        		SELECT NVL(MAX(BOARD_NUM),0)+1
+        		FROM BOARD
+	    		WHERE BOARD_TYPE = #{boardType}
+	    	 )
+        	,#{boardTitle}
+        	,#{boardComment}
+        	,'SYSTEM'
+        	,TO_CHAR(SYSDATE)
+        	,'SYSTEM'
+        	,TO_CHAR(SYSDATE)
+        	)
+        </foreach>
+    </insert>
+    
+    <update id="boardUpdate">
+    	UPDATE 
+    		BOARD 
+    	SET 
+    		BOARD_TITLE=#{boardTitle},
+    		BOARD_COMMENT=#{boardComment},
+    		MODIFIER='SYSTEM',
+    		MODIFIED_TIME=TO_CHAR(SYSDATE)
+    	WHERE BOARD_TYPE=#{boardType} 
+    	AND BOARD_NUM=#{boardNum}
+    </update>
+    
+    <delete id="boardDelete">
+    	DELETE 
+    	FROM 
+    		BOARD 
+    	WHERE BOARD_TYPE=#{boardType} 
+    	AND BOARD_NUM=#{boardNum}
+    </delete>
+    
+    <select id="boardTypeList" resultType="com.spring.board.vo.ComCodeVo">
+    	SELECT
+    		CODE_ID
+    		,CODE_NAME
+    	FROM
+    		COM_CODE
+    	WHERE
+    		CODE_TYPE = 'menu'
+    </select>
+    
+
+    
+    
+    
+    
+    
+    
+
+</mapper>
